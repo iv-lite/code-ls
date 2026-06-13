@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Check if code-ls exists in the current directory
+if [ ! -f code-ls ]; then
+    echo "Error: code-ls script not found. Please run the initial setup first."
+    exit 1
+fi
+
+# Determine the target binary directory (~/.local/bin is standard for user-installed binaries)
+INSTALL_DIR="${HOME}/.local/bin"
+
+echo "Attempting to install code-ls to ${INSTALL_DIR}..."
+
+# Check if the installation directory exists, and create it if needed
+if [ ! -d "$INSTALL_DIR" ]; then
+    echo "Creating required directory: $INSTALL_DIR"
+    mkdir -p "$INSTALL_DIR"
+fi
+
+# Copy the executable script to the installation directory
+cp code-ls "$INSTALL_DIR"/
+
+if [ $? -eq 0 ]; then
+    echo "\n✅ Installation successful!"
+    echo "The 'code-ls' script has been copied to ${INSTALL_DIR}/."
+    echo ""
+    echo "⚠️ IMPORTANT: For the system to recognize this new command, you must ensure that `${INSTALL_DIR}` is included in your system's PATH."
+
+    # Advise the user on updating their profile files
+    PROFILE_FILES=("$HOME/.bashrc" "$HOME/.zshrc") # Common shell profiles for Linux
+    UPDATE_PATH=false
+
+    for file in "${PROFILE_FILES[@]}"; do
+        if [ -f "$file" ] && ! grep -q "export PATH=.*${INSTALL_DIR}:" "$file"; then
+            echo "Suggestion: Please add the following line to your profile file ($file) and restart your terminal or run 'source $file':"
+            echo ""
+            echo "export PATH=\"\$HOME/.local/bin:\$PATH\""
+            UPDATE_PATH=true
+        fi
+    done
+
+    if [ "$UPDATE_PATH" = true ]; then
+        echo "\n⭐ Please execute the appropriate source command (e.g., 'source ~/.bashrc') to apply these changes."
+    else
+         echo "The PATH appears to be correctly configured already, or no suggestions were made."
+    fi
+
+else
+    echo "❌ Failed to copy code-ls. Check permissions and paths."
+fi

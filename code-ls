@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Loop through all directories in the current location
+for folder in */; do
+    if [ -d "$folder" ]; then
+        # Strip trailing slash for cleaner argument passing to 'code'
+        name="${folder%/}" 
+        echo "Opening folder $name..."
+        code "$name" & # Using '&' runs each code instance in the background and allows quick execution.
+    fi
+done
