@@ -1,9 +1,26 @@
 #!/bin/bash
 
-# Loop through all directories in the current location
-for folder in */; do
+# Check if a parent directory is provided as an argument
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <path_to_parent_directory>"
+    echo "Example: $0 ." # Example usage for current directory
+    exit 1
+fi
+
+PARENT_DIR="$1"
+
+# Check if the provided path exists and is a directory
+if [ ! -d "$PARENT_DIR" ]; then
+    echo "Error: Directory not found at '$PARENT_DIR'"
+    exit 1
+fi
+
+echo "Scanning folders in $PARENT_DIR..."
+
+# Loop through all items that are directories inside the specified parent directory
+for folder in "$PARENT_DIR"/*/; do
     if [ -d "$folder" ]; then
-        # Strip trailing slash for cleaner argument passing to 'code'
+        # Extract only the folder name, stripping the trailing slash from the full path
         name="${folder%/}" 
         echo "Opening folder $name..."
         code "$name" & # Using '&' runs each code instance in the background and allows quick execution.
